@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output-file",
-        default="tsp.txt",
+        default="example_tsp_in.txt",
         type=str,
         help="the path where the points should be written"
     )
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     with open(args.output_file, "w") as out:
         out.write(f"{args.n_samples} {args.dim}\n")
         for point in points:
-            out.write(" ".join([str(x) for x in point]) + "\n")
+            out.write(" ".join([str(x) for x in np.round(point, 5)]) + "\n")
 
     if args.dim == 2 and args.plot:
         # plot the points and save
