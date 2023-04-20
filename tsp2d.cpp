@@ -1,0 +1,152 @@
+#include <algorithm>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <vector>
+
+
+class TSP2DTransition {
+    public:
+        TSP2DTransition(long f, long s): swap_first(f), swap_second(s) {};
+        long swap_first;
+        long swap_second;
+};
+
+class TSP2DState {
+    private:
+        long N;
+        double* x1;
+        double* x2;
+        long* idxs;
+    public:
+
+        TSP2DState(long N, double* x1, double* x2) : N(N), x1(x1), x2(x2) {
+            this->idxs = (long*) malloc(sizeof(long) * N);
+            for (long i = 0; i < N; i++) this->idxs[i] = i;
+        }
+
+        long* get_idxs() {
+            return this->idxs;
+        }
+
+        void step(TSP2DTransition t) {
+            long tmp = this->idxs[t.swap_first];
+            this->idxs[t.swap_first] = this->idxs[t.swap_second];
+            this->idxs[t.swap_second] = tmp;
+        }
+
+        double energy(TSP2DState other) {
+            return this->objective() - other.objective();
+        }
+
+        double objective() {
+            double total_dist = 0.0;
+            for (long i = 0; i < N; i++) {
+                long i_curr = this->idxs[i];
+                long i_next = this->idxs[(i+1)%N];
+                double x1_max = std::max(this->x1[i_curr], this->x1[i_next]);
+                double x1_min = std::min(this->x1[i_curr], this->x1[i_next]);
+                double x2_max = std::max(this->x2[i_curr], this->x2[i_next]);
+                double x2_min = std::min(this->x2[i_curr], this->x2[i_next]);
+
+                total_dist += sqrt(
+                    (x1_max - x1_min) * (x1_max - x1_min) +
+                    (x2_max - x2_min) * (x2_max - x2_min)
+                );
+            }
+            return total_dist;
+        }
+};
+
+std::vector<std::string> split_line(std::string line) {
+
+    std::istringstream iss(line);
+    std::vector<std::string> words;
+    std::string word;
+    while (iss >> word) {
+        words.push_back(word);
+    }
+    return words;
+}
+
+TSP2DState from_text_file(std::string path) {
+    std::ifstream file(path);
+    if (file.is_open()) {
+        std::string line;
+        std::getline(file, line);
+        std::vector<std::string> nums = split_line(line);
+
+        long N = std::stol(nums[0]);
+
+        double* x1 = (double*) malloc(N * sizeof(double));
+        double* x2 = (double*) malloc(N * sizeof(double));
+
+        for (long i = 0; i < N; i++) {
+            std::getline(file, line);
+            std::vector<std::string> pts = split_line(line);
+            x1[i] = std::stof(pts[0]);
+            x2[i] = std::stof(pts[1]);
+        }
+
+        file.close();
+
+        return TSP2DState(N, x1, x2);
+    } else {
+        std::cout << "Unable to open file" << std::endl;
+        abort();
+    }
+}
+
+int main() {
+
+    // create points representing the unit square
+    double x[4] = {1., 1., 0., 0.};
+    double y[4] = {1., 0., 1., 0.};
+
+    double* x1 = (double*) malloc(4 * sizeof(double));
+    for (int i = 0; i < 4; i++) x1[i] = x[i];
+
+    double* x2 = (double*) malloc(4 * sizeof(double));
+    for (int i = 0; i < 4; i++) x2[i] = y[i];
+
+    long N = 4;
+
+    // create a state and a transition
+    TSP2DState state1 = TSP2DState(N, x1, x2);
+    TSP2DState state2 = TSP2DState(N, x1, x2);
+    TSP2DTransition transition = TSP2DTransition(2, 3);
+
+    printf("TRANSITION:\n");
+
+    // print the current path and the path length (the objective value)
+    for (int i = 0; i < 4; i++) printf("%ld ", state1.get_idxs()[i]);
+    printf("%ld\n", state1.get_idxs()[0]);
+    printf("obj = %f\n", state1.objective());
+
+    // use the transition to evolve the state
+    state1.step(transition);
+
+    for (int i = 0; i < 4; i++) printf("%ld ", state1.get_idxs()[i]);
+    printf("%ld\n", state1.get_idxs()[0]);
+    printf("obj = %f\n", state1.objective());
+
+    printf("ENERGY:\n");
+
+    printf("energy (1->2) = %f\n", state1.energy(state2));
+    printf("energy (2->1) = %f\n", state2.energy(state1));
+
+    free(x1);
+    free(x2);
+
+    printf("FROM FILE:\n");
+
+    TSP2DState from_file = from_text_file("tsp.txt");
+    TSP2DTransition transition1 = TSP2DTransition(32, 54);
+    TSP2DTransition transition2 = TSP2DTransition(71, 49);
+
+    printf("obj = %f\n", from_file.objective());
+    from_file.step(transition1);
+    from_file.step(transition2);
+    printf("obj = %f\n", from_file.objective());
+}
