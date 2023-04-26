@@ -108,6 +108,32 @@ class TSP2DState {
         }
 
         /**
+         * changing the energy calculator to only calculate the local change.  saves having to rebuild 
+         * a bunch of state objects while building transition matrix
+        */
+        double energy_local(TSP2DTransition* p) {
+            double curr_energy = this->objective();
+            double new_energy = curr_energy;
+            long first_curr = p->swap_first;
+            long first_next = this->idxs[(first_curr + 1)%N];
+            long first_prev = this->idxs[(first_curr + N - 1)%N];
+            long sec_curr = p->swap_second;
+            long sec_next = this->idxs[(sec_curr + 1)%N];
+            long sec_prev = this->idxs[(sec_curr + N - 1)%N];
+            new_energy += (
+                sqrt((x1[first_next]-x1[sec_curr])*(x1[first_next]-x1[sec_curr])) +
+                sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr])) +
+                sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr])) + 
+                sqrt((x1[sec_prev]-x1[first_curr])*(x1[sec_prev]-x1[first_curr])) -
+                sqrt((x1[first_next]-x1[first_curr])*(x1[first_next]-x1[first_curr])) -
+                sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr])) -
+                sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr])) -
+                sqrt((x1[sec_prev]-x1[sec_curr])*(x1[sec_prev]-x1[sec_curr]))
+            );
+            return curr_energy - new_energy;
+        }
+
+        /**
          * Calculates the total Euclidean distance of a tour.
          */
         double objective() {
@@ -128,6 +154,13 @@ class TSP2DState {
             }
             return total_dist;
         }
+
+        /**
+         * return number of stops
+        */
+       long stops() {
+            return this->N;
+       }
 
         /**
          * Display a state by printing to the console.
