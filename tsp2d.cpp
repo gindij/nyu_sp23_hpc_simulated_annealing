@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <math.h>
+#include <iomanip>
 
 std::vector<std::string> split_line(std::string line) {
 
