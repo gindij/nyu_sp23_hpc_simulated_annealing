@@ -4,6 +4,7 @@
 #include <vector>
 #include <math.h>
 #include <stdlib.h>
+#include <iostream>
 #include "tsp2d.cpp"
 
 enum BetaScaler {
@@ -14,12 +15,13 @@ enum BetaScaler {
 
 class Annealer {
     private:
-        int iteration;
+        long iteration;
         double beta;
-        std::Vector<std::Vector<double>> *t_matrix;
+        std::vector<std::vector<double>> t_matrix;
     public:
-        Annealer(int N, BetaScaler b) : iteration(1) {
-            this->tmatrix->resize(N, std::Vector<double>(N));
+        Annealer(TSP2DState curr_state, BetaScaler b) : iteration(1) {
+            long N = curr_state.stops();
+            this->t_matrix.resize(N, std::vector<double>(N));
             switch(b) {
                 case LOG:
                     this->beta = log(1.01);
@@ -34,32 +36,30 @@ class Annealer {
         }
 
         void generate_t_matrix(TSP2DState curr_state) {
-            t = curr_state.N;
-            for (int i = 0; i < t; ++i) {
-                for (int j = 0; j < t; ++j) {
-                    TSP2DTransition proposal = TSP2DTransition(i,j);
-                    dE = curr_state->energy_local(proposal);
+            long t = curr_state.stops();
+            for (long i = 0; i < t; ++i) {
+                for (long j = 0; j < t; ++j) {
+                    TSP2DTransition *proposal = new TSP2DTransition(i,j);
+                    double dE = curr_state.energy_local(proposal);
                     if (dE > 0) {
-                        t_matrix[i][j] = exp(-dE * beta)/(t*t); // mulitply by some power of 10 for large matrices?
+                        this->t_matrix[i][j] = exp(-dE * beta)/(t*t); // mulitply by some power of 10 for large matrices?
                     } else {
-                        t_matrix[i][j] = 1/(t*t);
+                        this->t_matrix[i][j] = 1/(t*t);
                     }
                 }
             }
         }
 
         // Future: change to a more general transition class?
-        TSP2DTransition select_transition(TSP2DState curr_state) {
-            TSP2DTransition selection;
+        TSP2DTransition* select_transition(TSP2DState curr_state) {
             double prob = rand();
             double prob_sum = 0.0;
-            t = curr_state.N;
+            long t = curr_state.stops();
             for (int i = 0; i < t; ++i) {
                 for (int j = 0; j < t; ++j) {
                     prob_sum += t_matrix[i][j];
                     if (prob < prob_sum) {
-                        selection = TSP2DTransition(i,j);
-                        return selection;
+                        return new TSP2DTransition(i,j);
                     }
                 }
             }
@@ -71,9 +71,27 @@ class Annealer {
             double min_objective = curr_objective;
             double residual;
             double tol = 1e-5;
-            do {
-
-            } while () // condition where minimum doesn't change for x number of iterations?
+            while (this->iteration < 20) { //**** temporary cap on iterations ****
+                long curr_it = this->iteration;
+                if (curr_it % 5 == 0) {
+                    int cont;
+                    std::cout << "Current minimum = " << min_objective << std::endl;
+                    std::cout << "Continue?" << std::endl;
+                    std::cin >> cont;
+                    if (cont) break;
+                }
+                if (curr_it % 3 == 0) {
+                    this->beta = log(exp(this->beta) + 1);
+                }
+                this->generate_t_matrix(curr_state);
+                TSP2DTransition* trans = this->select_transition(curr_state);
+                curr_state.step(trans);
+                curr_objective = curr_state.objective();
+                if (curr_objective < min_objective) {
+                    min_objective = curr_objective;
+                }
+                ++this->iteration;
+            }
         }
 
 };
