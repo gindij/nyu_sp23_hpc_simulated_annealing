@@ -143,7 +143,6 @@ class TSP2DState {
                     sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr]) + (x2[sec_next]-x2[sec_curr])*(x2[sec_next]-x2[sec_curr])) 
                 );
             }
-            std::cout<<"NEW ENERGY = " << new_energy << "\n" << "OLD ENERGY = " << curr_energy << std::endl;
             return new_energy-curr_energy;
         }
 
