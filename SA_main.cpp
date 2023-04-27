@@ -46,9 +46,13 @@ int main() {
     printf("energy (1->2) = %f\n", state1.energy(&state2));
     printf("energy (2->1) = %f\n", state2.energy(&state1));
 
-    state2.display_state();
-    state2.display_coords();
     printf("energy local test (1->2) = %f\n", state2.energy_local(transition));
+
+    // Annealer TSP = Annealer(state2.stops(), LOG);
+    // TSP.generate_t_matrix(&state2);
+    // TSP.display_params();
+    // TSP.display_t_matrix();
+    // TSP.anneal(&state2);
 
     printf("FROM FILE:\n");
 
@@ -60,6 +64,11 @@ int main() {
     from_file.step(&transition1);
     from_file.step(&transition2);
     printf("obj = %f\n", from_file.objective());
+
+    Annealer TSP = Annealer(from_file.stops(), LOG);
+    TSP.generate_t_matrix(&from_file);
+    TSP.display_params();
+    TSP.anneal(&from_file);
 
     from_file.write_txt("example_tsp_out.txt");
 }

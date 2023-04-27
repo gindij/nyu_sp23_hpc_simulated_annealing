@@ -104,7 +104,7 @@ class TSP2DState {
          * of the other state. (For this problem, the objective is total Euclidean distance.)
          */
         double energy(TSP2DState* other) {
-            return other->objective() - this->objective();
+            return this->objective() - other->objective();
         }
 
         /**
