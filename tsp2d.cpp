@@ -104,33 +104,47 @@ class TSP2DState {
          * of the other state. (For this problem, the objective is total Euclidean distance.)
          */
         double energy(TSP2DState* other) {
-            return this->objective() - other->objective();
+            return other->objective() - this->objective();
         }
 
         /**
          * changing the energy calculator to only calculate the local change.  saves having to rebuild 
          * a bunch of state objects while building transition matrix
         */
-        double energy_local(TSP2DTransition* p) {
+        double energy_local(TSP2DTransition p) {
+            if (p.swap_first == p.swap_second) return 0.0;
             double curr_energy = this->objective();
             double new_energy = curr_energy;
-            long first_curr = p->swap_first;
-            long first_next = this->idxs[(first_curr + 1)%N];
-            long first_prev = this->idxs[(first_curr + N - 1)%N];
-            long sec_curr = p->swap_second;
-            long sec_next = this->idxs[(sec_curr + 1)%N];
-            long sec_prev = this->idxs[(sec_curr + N - 1)%N];
-            new_energy += (
-                sqrt((x1[first_next]-x1[sec_curr])*(x1[first_next]-x1[sec_curr])) +
-                sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr])) +
-                sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr])) + 
-                sqrt((x1[sec_prev]-x1[first_curr])*(x1[sec_prev]-x1[first_curr])) -
-                sqrt((x1[first_next]-x1[first_curr])*(x1[first_next]-x1[first_curr])) -
-                sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr])) -
-                sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr])) -
-                sqrt((x1[sec_prev]-x1[sec_curr])*(x1[sec_prev]-x1[sec_curr]))
-            );
-            return curr_energy - new_energy;
+            long first = std::min(p.swap_first,p.swap_second);
+            long second = std::max(p.swap_first,p.swap_second);
+            long first_curr = this->idxs[first];
+            long first_next = this->idxs[(first + 1)%N];
+            long first_prev = this->idxs[(first + N - 1)%N];
+            long sec_curr = this->idxs[second];
+            long sec_next = this->idxs[(second + 1)%N];
+            long sec_prev = this->idxs[(second + N - 1)%N];
+            
+            if (second - first > 1) {
+                new_energy += (
+                    sqrt((x1[first_next]-x1[sec_curr])*(x1[first_next]-x1[sec_curr]) + (x2[first_next]-x2[sec_curr])*(x2[first_next]-x2[sec_curr])) +
+                    sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr]) + (x2[first_prev]-x2[sec_curr])*(x2[first_prev]-x2[sec_curr])) +
+                    sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr]) + (x2[sec_next]-x2[first_curr])*(x2[sec_next]-x2[first_curr])) + 
+                    sqrt((x1[sec_prev]-x1[first_curr])*(x1[sec_prev]-x1[first_curr]) + (x2[sec_prev]-x2[first_curr])*(x2[sec_prev]-x2[first_curr])) -
+                    sqrt((x1[first_next]-x1[first_curr])*(x1[first_next]-x1[first_curr]) + (x2[first_next]-x2[first_curr])*(x2[first_next]-x2[first_curr])) -
+                    sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr]) + (x2[first_prev]-x2[first_curr])*(x2[first_prev]-x2[first_curr])) -
+                    sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr]) + (x2[sec_next]-x2[sec_curr])*(x2[sec_next]-x2[sec_curr])) -
+                    sqrt((x1[sec_prev]-x1[sec_curr])*(x1[sec_prev]-x1[sec_curr]) + (x2[sec_prev]-x2[sec_curr])*(x2[sec_prev]-x2[sec_curr]))
+                );
+            } else {
+                new_energy += (
+                    sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr]) + (x2[first_prev]-x2[sec_curr])*(x2[first_prev]-x2[sec_curr])) +
+                    sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr]) + (x2[sec_next]-x2[first_curr])*(x2[sec_next]-x2[first_curr])) -
+                    sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr]) + (x2[first_prev]-x2[first_curr])*(x2[first_prev]-x2[first_curr])) -
+                    sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr]) + (x2[sec_next]-x2[sec_curr])*(x2[sec_next]-x2[sec_curr])) 
+                );
+            }
+            std::cout<<"NEW ENERGY = " << new_energy << "\n" << "OLD ENERGY = " << curr_energy << std::endl;
+            return new_energy-curr_energy;
         }
 
         /**
@@ -172,6 +186,15 @@ class TSP2DState {
         }
 
         /**
+         * Display coordinates of the state.
+        */
+        void display_coords() {
+            for (int i = 0; i < this->N + 1; i++)
+                printf("(%f, %f) ", this->x1[this->get_idxs()[i%N]], this->x2[this->get_idxs()[i%N]]);
+            printf("\n");
+        }
+
+        /**
          * Write tour to file pairs of points.
          */
         void write_txt(std::string path) {
@@ -192,60 +215,62 @@ class TSP2DState {
         }
 };
 
-int main() {
+// int main() {
 
-    // create points representing the unit square
-    double x[4] = {1., 1., 0., 0.};
-    double y[4] = {1., 0., 1., 0.};
+//     // create points representing the unit square
+//     double x[4] = {1., 1., 0., 0.};
+//     double y[4] = {1., 0., 1., 0.};
 
-    double* x11 = (double*) malloc(4 * sizeof(double));
-    double* x12 = (double*) malloc(4 * sizeof(double));
-    for (int i = 0; i < 4; i++) {
-        x11[i] = x[i];
-        x12[i] = x[i];
-    }
+//     double* x11 = (double*) malloc(4 * sizeof(double));
+//     double* x12 = (double*) malloc(4 * sizeof(double));
+//     for (int i = 0; i < 4; i++) {
+//         x11[i] = x[i];
+//         x12[i] = x[i];
+//     }
 
-    double* x21 = (double*) malloc(4 * sizeof(double));
-    double* x22 = (double*) malloc(4 * sizeof(double));
-    for (int i = 0; i < 4; i++) {
-        x21[i] = y[i];
-        x22[i] = y[i];
-    }
+//     double* x21 = (double*) malloc(4 * sizeof(double));
+//     double* x22 = (double*) malloc(4 * sizeof(double));
+//     for (int i = 0; i < 4; i++) {
+//         x21[i] = y[i];
+//         x22[i] = y[i];
+//     }
 
-    long N = 4;
+//     long N = 4;
 
-    // create states and a transition
-    TSP2DState state1 = TSP2DState(N, x11, x21);
-    TSP2DState state2 = TSP2DState(N, x12, x22);
-    TSP2DTransition transition = TSP2DTransition(2, 3);
+//     // create states and a transition
+//     TSP2DState state1 = TSP2DState(N, x11, x21);
+//     TSP2DState state2 = TSP2DState(N, x12, x22);
+//     TSP2DTransition transition = TSP2DTransition(2, 3);
 
-    printf("TRANSITION:\n");
+//     printf("TRANSITION:\n");
 
-    // print the current path and the path length (the objective value)
-    state1.display_state();
-    printf("obj = %f\n", state1.objective());
+//     // print the current path and the path length (the objective value)
+//     state1.display_state();
+//     printf("obj = %f\n", state1.objective());
 
-    // use the transition to evolve the state
-    state1.step(&transition);
+//     // use the transition to evolve the state
+//     state1.step(&transition);
 
-    state1.display_state();
-    printf("obj = %f\n", state1.objective());
+//     state1.display_state();
+//     printf("obj = %f\n", state1.objective());
 
-    printf("ENERGY:\n");
+//     printf("ENERGY:\n");
 
-    printf("energy (1->2) = %f\n", state1.energy(&state2));
-    printf("energy (2->1) = %f\n", state2.energy(&state1));
+//     printf("energy (1->2) = %f\n", state1.energy(&state2));
+//     printf("energy (2->1) = %f\n", state2.energy(&state1));
 
-    printf("FROM FILE:\n");
+//     printf("energy local test (1->) = %f\n", state1.energy_local(&state2));
 
-    TSP2DState from_file = TSP2DState::from_text_file("example_tsp_in.txt");
-    TSP2DTransition transition1 = TSP2DTransition(0, 1);
-    TSP2DTransition transition2 = TSP2DTransition(71, 49);
+//     printf("FROM FILE:\n");
 
-    printf("obj = %f\n", from_file.objective());
-    from_file.step(&transition1);
-    from_file.step(&transition2);
-    printf("obj = %f\n", from_file.objective());
+//     TSP2DState from_file = TSP2DState::from_text_file("example_tsp_in.txt");
+//     TSP2DTransition transition1 = TSP2DTransition(0, 1);
+//     TSP2DTransition transition2 = TSP2DTransition(71, 49);
 
-    from_file.write_txt("example_tsp_out.txt");
-}
+//     printf("obj = %f\n", from_file.objective());
+//     from_file.step(&transition1);
+//     from_file.step(&transition2);
+//     printf("obj = %f\n", from_file.objective());
+
+//     from_file.write_txt("example_tsp_out.txt");
+// }
