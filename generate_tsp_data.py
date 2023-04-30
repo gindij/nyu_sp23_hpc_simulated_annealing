@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 
@@ -26,8 +27,8 @@ if __name__ == "__main__":
         help="spread of each cluster. (higher number will make the clusters more diffuse)"
     )
     parser.add_argument(
-        "--output-file",
-        default="example_tsp_in.txt",
+        "--output-dir",
+        default="tsp_examples",
         type=str,
         help="the path where the points should be written"
     )
@@ -46,16 +47,19 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    assert args.output_file.endswith(".txt"), "output file must be a txt file"
-
     points, _ = make_blobs(
         n_samples=args.n_samples,
         n_features=args.dim,
         cluster_std=args.spread,
     )
 
+    full_output_dir = os.path.join(args.output_dir, f"spread={args.spread}")
+    if not os.path.exists(full_output_dir):
+        os.mkdir(full_output_dir)
+
     # write the output file
-    with open(args.output_file, "w") as out:
+    output_path = os.path.join(full_output_dir, f"{args.n_samples}.txt")
+    with open(output_path, "w") as out:
         out.write(f"{args.n_samples} {args.dim}\n")
         for point in points:
             out.write(" ".join([str(x) for x in np.round(point, 5)]) + "\n")
