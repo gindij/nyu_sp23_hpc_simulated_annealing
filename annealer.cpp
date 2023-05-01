@@ -18,6 +18,7 @@ class Annealer {
         long iteration;
         double beta;
         std::vector<std::vector<double>> t_matrix;
+        long* min_state;
     public:
         Annealer(long N, BetaScaler b) : iteration(1) {
             this->t_matrix.resize(N, std::vector<double>(N));
@@ -83,12 +84,12 @@ class Annealer {
         }
 
         // Want ability to continue with current beta? or kill if we get stuck in a minima
-        void anneal(TSP2DState* curr_state) {
+        double anneal(TSP2DState* curr_state, long N) {
             double curr_objective = curr_state->objective();
             double min_objective = curr_objective;
             double residual;
             double tol = 1e-5;
-            while (this->iteration < 100000) { //**** temporary cap on iterations ****
+            while (this->iteration < N) { //**** temporary cap on iterations ****
                 long curr_it = this->iteration;
                 if (curr_it % 50000 == 0) {
                     int cont;
@@ -109,10 +110,15 @@ class Annealer {
                 // std::cout << "Current beta = " << this->beta << std::endl;
                 if (curr_objective < min_objective) {
                     min_objective = curr_objective;
+                    this->min_state = curr_state->get_idxs();
                 }
                 ++this->iteration;
             }
             std::cout<<"Final minimum found: "<<min_objective<<std::endl;
+            return min_objective;
         }
 
+        long* get_min_state() {
+            return this->min_state;
+        }
 };
