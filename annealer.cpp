@@ -88,9 +88,9 @@ class Annealer {
             double min_objective = curr_objective;
             double residual;
             double tol = 1e-5;
-            while (this->iteration < 1000) { //**** temporary cap on iterations ****
+            while (this->iteration < 100000) { //**** temporary cap on iterations ****
                 long curr_it = this->iteration;
-                if (curr_it % 100 == 0) {
+                if (curr_it % 50000 == 0) {
                     int cont;
                     std::cout << "Current minimum = " << min_objective << std::endl;
                     std::cout << "Continue?" << std::endl;
@@ -112,6 +112,7 @@ class Annealer {
                 }
                 ++this->iteration;
             }
+            std::cout<<"Final minimum found: "<<min_objective<<std::endl;
         }
 
 };
