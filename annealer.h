@@ -68,7 +68,7 @@ class Annealer {
 
         // Future: change to a more general transition class?
         TSP2DTransition* select_transition(TSP2DState* curr_state) {
-            double prob = (double) (rand() % 100);
+            double prob = drand48() * 100.;
             double prob_sum = 0.0;
             long t = curr_state->stops();
             for (int i = 0; i < t; ++i) {
