@@ -18,13 +18,9 @@ class Annealer {
         long iteration;
         double beta;
         std::vector<std::vector<double>> t_matrix;
-        long* min_state;
+        std::vector<long> min_state;
     public:
-        Annealer(long N, BetaScaler b) : iteration(1) {
-            this->t_matrix.resize(N);
-	        for (long i = 0; i < N; i++) {
-			    this->t_matrix[i].resize(N);
-			}
+        Annealer(long N, BetaScaler b) : iteration(1), t_matrix(N, std::vector<double>(N, 0)), min_state(N, 0) {
             switch(b) {
                 case LOG:
                     this->beta = log(1.01);
@@ -121,7 +117,7 @@ class Annealer {
             return min_objective;
         }
 
-        long* get_min_state() {
+        std::vector<long> get_min_state() {
             return this->min_state;
         }
 };
