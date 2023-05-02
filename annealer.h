@@ -5,7 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
-#include "tsp2d.cpp"
+#include "tsp2d.h"
 
 enum BetaScaler {
     LOG,
@@ -21,7 +21,10 @@ class Annealer {
         long* min_state;
     public:
         Annealer(long N, BetaScaler b) : iteration(1) {
-            this->t_matrix.resize(N, std::vector<double>(N));
+            this->t_matrix.resize(N);
+	        for (long i = 0; i < N; i++) {
+			    this->t_matrix[i].resize(N);
+			}
             switch(b) {
                 case LOG:
                     this->beta = log(1.01);

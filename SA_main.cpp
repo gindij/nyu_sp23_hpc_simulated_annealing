@@ -1,6 +1,6 @@
 #include <iostream>
 #include <mpi.h>
-#include "annealer.cpp"
+#include "annealer.h"
 
 int main(int argc, char** argv) {
 
@@ -76,18 +76,18 @@ int main(int argc, char** argv) {
 
     MPI_Status status;
 
-    TSP2DState parallel_state = TSP2DState::from_text_file("example_tsp_in.txt");
+    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/100.txt");
     Annealer parallel_annealer = Annealer(parallel_state.stops(), LOG);
 
-    double min_objective = parallel_annealer.anneal(1000);
+    double min_objective = parallel_annealer.anneal(&parallel_state, 1000);
     long* min_state = parallel_annealer.get_min_state();
     long size = parallel_state.stops();
 
     MPI_Barrier(comm);
 
     if (mpirank != 0) {
-        MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm, &status);
-        MPI_Send(&min_state, size, MPI_LONG, 0, 999, comm, &status);
+        MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
+        MPI_Send(&min_state, size, MPI_LONG, 0, 999, comm);
     }
 
     if (mpirank == 0) {
@@ -98,10 +98,10 @@ int main(int argc, char** argv) {
             MPI_Recv(&recv_min_objective, 1, MPI_DOUBLE, i, 999, comm, &status);
             MPI_Recv(&recv_min_state, size, MPI_LONG, i, 999, comm, &status);
             // Rank 0 min_objective already computed
-            if (recv_min < min_objective) {
+            if (recv_min_objective < min_objective) {
                 min_objective = recv_min_objective;
-                min_idx = i;
                 min_state = recv_min_state;
+                min_idx = i;
             }
         }
         // Rank 0 broadcasts the min state
@@ -113,4 +113,6 @@ int main(int argc, char** argv) {
     parallel_state.set_idxs(min_state);
 
     std::cout<< "Hello from rank " << mpirank << ", we got annealed." << std::endl;
+
+    MPI_Finalize();
 }
