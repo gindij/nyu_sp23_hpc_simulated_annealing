@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
     MPI_Comm_size(comm, &mpisize);
 
     // srand(mpirank);
+    srand48(mpirank);
 
     MPI_Status status;
 
