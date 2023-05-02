@@ -86,12 +86,15 @@ class TSP2DState {
         /**
          * Returns the current tour structure.
          */
-        long* get_idxs() {
-            return this->idxs;
+        std::vector<long> get_idxs() {
+            std::vector<long> copy = std::vector<long>(this->N, 0);
+            for (long i = 0; i < this->N; i++) copy[i] = this->idxs[i];
+            return copy;
         }
 
-        void set_idxs(long* new_idxs) {
-            this->idxs = new_idxs;
+        void set_idxs(std::vector<long> new_idxs) {
+            for (long i = 0; i < this->N; i++)
+                this->idxs[i] = new_idxs[i];
         }
 
         /**
