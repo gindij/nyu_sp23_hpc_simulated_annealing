@@ -80,35 +80,38 @@ int main(int argc, char** argv) {
     Annealer parallel_annealer = Annealer(parallel_state.stops(), LOG);
 
     double min_objective = parallel_annealer.anneal(&parallel_state, 1000);
-    long* min_state = parallel_annealer.get_min_state();
+    std::vector<long> min_state = parallel_annealer.get_min_state();
     long size = parallel_state.stops();
 
     MPI_Barrier(comm);
 
     if (mpirank != 0) {
         MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
-        MPI_Send(&min_state, size, MPI_LONG, 0, 999, comm);
+        MPI_Send(min_state.data(), size, MPI_LONG, 0, 999, comm);
     }
 
     if (mpirank == 0) {
         double recv_min_objective;
-        long* recv_min_state;
+        long* recv_min_state = (long*) malloc(size * sizeof(long));
         int min_idx;
         for (int i = 1; i < mpisize; ++i) {
             MPI_Recv(&recv_min_objective, 1, MPI_DOUBLE, i, 999, comm, &status);
-            MPI_Recv(&recv_min_state, size, MPI_LONG, i, 999, comm, &status);
+            MPI_Recv(recv_min_state, size, MPI_LONG, i, 999, comm, &status);
             // Rank 0 min_objective already computed
             if (recv_min_objective < min_objective) {
                 min_objective = recv_min_objective;
-                min_state = recv_min_state;
+                for (long j = 0; j < size; j++)
+                    min_state[j] = recv_min_state[j];
                 min_idx = i;
             }
         }
         // Rank 0 broadcasts the min state
-        MPI_Bcast(&min_state, size, MPI_LONG, 0, comm);
+        MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
+        free(recv_min_state);
     }
 
     MPI_Barrier(comm);
+
     //Everyone's min_state should be the network minimum;
     parallel_state.set_idxs(min_state);
 
