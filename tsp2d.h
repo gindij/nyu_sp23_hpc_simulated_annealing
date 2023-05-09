@@ -115,7 +115,7 @@ class TSP2DState {
         }
 
         /**
-         * changing the energy calculator to only calculate the local change.  saves having to rebuild 
+         * changing the energy calculator to only calculate the local change.  saves having to rebuild
          * a bunch of state objects while building transition matrix
         */
         double energy_local(TSP2DTransition p) {
@@ -130,12 +130,12 @@ class TSP2DState {
             long sec_curr = this->idxs[second];
             long sec_next = this->idxs[(second + 1)%N];
             long sec_prev = this->idxs[(second + N - 1)%N];
-            
+
             if (second - first > 1) {
                 new_energy += (
                     sqrt((x1[first_next]-x1[sec_curr])*(x1[first_next]-x1[sec_curr]) + (x2[first_next]-x2[sec_curr])*(x2[first_next]-x2[sec_curr])) +
                     sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr]) + (x2[first_prev]-x2[sec_curr])*(x2[first_prev]-x2[sec_curr])) +
-                    sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr]) + (x2[sec_next]-x2[first_curr])*(x2[sec_next]-x2[first_curr])) + 
+                    sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr]) + (x2[sec_next]-x2[first_curr])*(x2[sec_next]-x2[first_curr])) +
                     sqrt((x1[sec_prev]-x1[first_curr])*(x1[sec_prev]-x1[first_curr]) + (x2[sec_prev]-x2[first_curr])*(x2[sec_prev]-x2[first_curr])) -
                     sqrt((x1[first_next]-x1[first_curr])*(x1[first_next]-x1[first_curr]) + (x2[first_next]-x2[first_curr])*(x2[first_next]-x2[first_curr])) -
                     sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr]) + (x2[first_prev]-x2[first_curr])*(x2[first_prev]-x2[first_curr])) -
@@ -147,7 +147,7 @@ class TSP2DState {
                     sqrt((x1[first_prev]-x1[sec_curr])*(x1[first_prev]-x1[sec_curr]) + (x2[first_prev]-x2[sec_curr])*(x2[first_prev]-x2[sec_curr])) +
                     sqrt((x1[sec_next]-x1[first_curr])*(x1[sec_next]-x1[first_curr]) + (x2[sec_next]-x2[first_curr])*(x2[sec_next]-x2[first_curr])) -
                     sqrt((x1[first_prev]-x1[first_curr])*(x1[first_prev]-x1[first_curr]) + (x2[first_prev]-x2[first_curr])*(x2[first_prev]-x2[first_curr])) -
-                    sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr]) + (x2[sec_next]-x2[sec_curr])*(x2[sec_next]-x2[sec_curr])) 
+                    sqrt((x1[sec_next]-x1[sec_curr])*(x1[sec_next]-x1[sec_curr]) + (x2[sec_next]-x2[sec_curr])*(x2[sec_next]-x2[sec_curr]))
                 );
             }
             return new_energy-curr_energy;
@@ -178,7 +178,7 @@ class TSP2DState {
         /**
          * return number of stops
         */
-       long stops() {
+       long num_stops() {
             return this->N;
        }
 

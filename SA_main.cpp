@@ -67,6 +67,8 @@ int main(int argc, char** argv) {
 
     // from_file.write_txt("example_tsp_out.txt");
 
+    long MAX_ITERATIONS = 10;
+
     MPI_Init(&argc, &argv);
     MPI_Comm comm = MPI_COMM_WORLD;
 
@@ -80,45 +82,55 @@ int main(int argc, char** argv) {
     MPI_Status status;
 
     TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/100.txt");
-    Annealer parallel_annealer = Annealer(parallel_state.stops(), LOG);
+    Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
-    double min_objective = parallel_annealer.anneal(&parallel_state, 1000);
-    std::vector<long> min_state = parallel_annealer.get_min_state();
-    long size = parallel_state.stops();
+    double min_objective;
+    std::vector<long> min_state;
+    long size = parallel_state.num_stops();
 
-    MPI_Barrier(comm);
+    long iters = 0;
 
-    if (mpirank != 0) {
-        MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
-        MPI_Send(min_state.data(), size, MPI_LONG, 0, 999, comm);
-    }
+    while(true && iters < MAX_ITERATIONS) {
+        // each process searches for a next state
+        min_objective = parallel_annealer.anneal(&parallel_state, 1000);
+        min_state = parallel_annealer.get_min_state();
 
-    if (mpirank == 0) {
-        double recv_min_objective;
-        long* recv_min_state = (long*) malloc(size * sizeof(long));
-        int min_idx;
-        for (int i = 1; i < mpisize; ++i) {
-            MPI_Recv(&recv_min_objective, 1, MPI_DOUBLE, i, 999, comm, &status);
-            MPI_Recv(recv_min_state, size, MPI_LONG, i, 999, comm, &status);
-            // Rank 0 min_objective already computed
-            if (recv_min_objective < min_objective) {
-                min_objective = recv_min_objective;
-                for (long j = 0; j < size; j++)
-                    min_state[j] = recv_min_state[j];
-                min_idx = i;
-            }
+        MPI_Barrier(comm);
+
+        if (mpirank != 0) {
+            MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
+            MPI_Send(min_state.data(), size, MPI_LONG, 0, 999, comm);
         }
-        // Rank 0 broadcasts the min state
-        MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
-        free(recv_min_state);
+
+        if (mpirank == 0) {
+            double recv_min_objective;
+            long* recv_min_state = (long*) malloc(size * sizeof(long));
+            int min_idx;
+            for (int i = 1; i < mpisize; ++i) {
+                MPI_Recv(&recv_min_objective, 1, MPI_DOUBLE, i, 999, comm, &status);
+                MPI_Recv(recv_min_state, size, MPI_LONG, i, 999, comm, &status);
+                // Rank 0 min_objective already computed
+                if (recv_min_objective < min_objective) {
+                    min_objective = recv_min_objective;
+                    for (long j = 0; j < size; j++)
+                        min_state[j] = recv_min_state[j];
+                    min_idx = i;
+                }
+            }
+            // Rank 0 broadcasts the min state
+            MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
+            free(recv_min_state);
+
+            std::cout << iters+1 << ": Best tour length = " << min_objective;
+        }
+
+        MPI_Barrier(comm);
+
+        //Everyone's min_state should be the network minimum;
+        parallel_state.set_idxs(min_state);
+        iters++;
     }
-
-    MPI_Barrier(comm);
-
-    //Everyone's min_state should be the network minimum;
-    parallel_state.set_idxs(min_state);
-
-    std::cout<< "Hello from rank " << mpirank << ", we got annealed." << std::endl;
+    // std::cout<< "Hello from rank " << mpirank << ", we got annealed." << std::endl;
 
     MPI_Finalize();
 }
