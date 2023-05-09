@@ -34,6 +34,10 @@ class Annealer {
             }
         }
 
+        long get_iteration() {
+          return this->iteration;
+        }
+
         void display_params() {
             std::cout << "Beta = " << this->beta << "\n" <<
                          "Iteration = " << this->iteration << "\n" <<
@@ -41,7 +45,7 @@ class Annealer {
         }
 
         void generate_t_matrix(TSP2DState* curr_state) {
-            long t = curr_state->stops();
+            long t = curr_state->num_stops();
             TSP2DTransition proposal = TSP2DTransition(0,0);
             for (long i = 0; i < t; ++i) {
                 for (long j = 0; j < t; ++j) {
@@ -70,7 +74,7 @@ class Annealer {
         TSP2DTransition* select_transition(TSP2DState* curr_state) {
             double prob = drand48() * 100.;
             double prob_sum = 0.0;
-            long t = curr_state->stops();
+            long t = curr_state->num_stops();
             for (int i = 0; i < t; ++i) {
                 for (int j = 0; j < t; ++j) {
                     prob_sum += t_matrix[i][j];
@@ -83,13 +87,14 @@ class Annealer {
         }
 
         // Want ability to continue with current beta? or kill if we get stuck in a minima
-        double anneal(TSP2DState* curr_state, long N) {
+        double anneal(TSP2DState* curr_state, long iters_to_run, long max_iters) {
             double curr_objective = curr_state->objective();
             double min_objective = curr_objective;
             double residual;
             double tol = 1e-5;
-            while (this->iteration < N) { //**** temporary cap on iterations ****
-                long curr_it = this->iteration;
+            long iters = 0;
+            while (iters < iters_to_run && this->iteration + iters < max_iters) { //**** temporary cap on iterations ****
+                long curr_it = this->iteration + iters;
                 if (curr_it % 50000 == 0) {
                     int cont;
                     std::cout << "Current minimum = " << min_objective << std::endl;
@@ -111,9 +116,10 @@ class Annealer {
                     min_objective = curr_objective;
                     this->min_state = curr_state->get_idxs();
                 }
-                ++this->iteration;
+                iters++;
             }
-            std::cout<<"Final minimum found: "<<min_objective<<std::endl;
+            this->iteration += iters;
+            // std::cout << "iterations: " << iters << " - Final minimum found: "<<min_objective<<std::endl;
             return min_objective;
         }
 

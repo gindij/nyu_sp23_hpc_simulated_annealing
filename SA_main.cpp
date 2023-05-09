@@ -67,7 +67,9 @@ int main(int argc, char** argv) {
 
     // from_file.write_txt("example_tsp_out.txt");
 
-    long MAX_ITERATIONS = 10;
+    long MAX_ITERATIONS = 100;
+    long MAX_ANNEALER_ITERATIONS = 10000;
+    long ANNEALING_STEPS_PER_ITERATION = 100;
 
     MPI_Init(&argc, &argv);
     MPI_Comm comm = MPI_COMM_WORLD;
@@ -81,7 +83,7 @@ int main(int argc, char** argv) {
 
     MPI_Status status;
 
-    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/100.txt");
+    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/10000.txt");
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
@@ -90,9 +92,10 @@ int main(int argc, char** argv) {
 
     long iters = 0;
 
-    while(true && iters < MAX_ITERATIONS) {
+    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+
         // each process searches for a next state
-        min_objective = parallel_annealer.anneal(&parallel_state, 1000);
+        min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
 
         MPI_Barrier(comm);
@@ -103,8 +106,8 @@ int main(int argc, char** argv) {
         }
 
         if (mpirank == 0) {
-            double recv_min_objective;
             long* recv_min_state = (long*) malloc(size * sizeof(long));
+            double recv_min_objective;
             int min_idx;
             for (int i = 1; i < mpisize; ++i) {
                 MPI_Recv(&recv_min_objective, 1, MPI_DOUBLE, i, 999, comm, &status);
@@ -121,7 +124,7 @@ int main(int argc, char** argv) {
             MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
             free(recv_min_state);
 
-            std::cout << iters+1 << ": Best tour length = " << min_objective;
+            std::cout << iters+1 << ": Best tour length = " << min_objective << std::endl;
         }
 
         MPI_Barrier(comm);
