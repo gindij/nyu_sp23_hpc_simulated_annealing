@@ -1,75 +1,47 @@
 #include <iostream>
 #include <mpi.h>
+#include <unistd.h>
 #include "annealer.h"
 
+
+// command line args:
+//    -n : set maximum number of iterations in while loop
+//    -i : set maximum number of iterations within annealer
+//    -j : set number of steps per iterations in annealer
+//    -t : set tolerance 
 int main(int argc, char** argv) {
 
-    // create points representing the unit square
-    // double x[4] = {1., 1., 0., 0.};
-    // double y[4] = {1., 0., 1., 0.};
-
-    // double* x11 = (double*) malloc(4 * sizeof(double));
-    // double* x12 = (double*) malloc(4 * sizeof(double));
-    // for (int i = 0; i < 4; i++) {
-    //     x11[i] = x[i];
-    //     x12[i] = x[i];
-    // }
-
-    // double* x21 = (double*) malloc(4 * sizeof(double));
-    // double* x22 = (double*) malloc(4 * sizeof(double));
-    // for (int i = 0; i < 4; i++) {
-    //     x21[i] = y[i];
-    //     x22[i] = y[i];
-    // }
-
-    // long N = 4;
-
-    // // create states and a transition
-    // TSP2DState state1 = TSP2DState(N, x11, x21);
-    // TSP2DState state2 = TSP2DState(N, x12, x22);
-    // TSP2DTransition transition = TSP2DTransition(2, 3);
-
-    // printf("TRANSITION:\n");
-
-    // // print the current path and the path length (the objective value)
-    // state1.display_state();
-    // state1.display_coords();
-    // printf("obj = %f\n", state1.objective());
-
-    // // use the transition to evolve the state
-    // state1.step(&transition);
-
-    // state1.display_state();
-    // printf("obj = %f\n", state1.objective());
-
-    // printf("ENERGY:\n");
-
-    // printf("energy (1->2) = %f\n", state1.energy(&state2));
-    // printf("energy (2->1) = %f\n", state2.energy(&state1));
-
-    // printf("energy local test (1->2) = %f\n", state2.energy_local(transition));
-
-    // printf("FROM FILE:\n");
-
-    // TSP2DState from_file = TSP2DState::from_text_file("example_tsp_in.txt");
-    // TSP2DTransition transition1 = TSP2DTransition(0, 1);
-    // TSP2DTransition transition2 = TSP2DTransition(71, 49);
-
-    // printf("obj = %f\n", from_file.objective());
-    // from_file.step(&transition1);
-    // from_file.step(&transition2);
-    // printf("obj = %f\n", from_file.objective());
-
-    // Annealer TSP = Annealer(from_file.stops(), LOG);
-    // TSP.generate_t_matrix(&from_file);
-    // TSP.display_params();
-    // TSP.anneal(&from_file);
-
-    // from_file.write_txt("example_tsp_out.txt");
-
+    int c;
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
+    double TOLERANCE = 0.0001;
+
+    while((c = getopt(argc, argv, "n:i:j:t:")) != -1) {
+        switch(c) {
+            case 'n':
+                MAX_ITERATIONS = atol(optarg);
+                break;
+            case 'i':
+                MAX_ANNEALER_ITERATIONS = atol(optarg);
+                break;
+            case 'j':
+                ANNEALING_STEPS_PER_ITERATION = atol(optarg);
+                break;
+            case 't':
+                TOLERANCE = std::stod(optarg);
+                break;
+            case '?':
+                if (optopt == 'n' || optopt == 'i' || optopt == 'j') {
+                    std::cout << "Option " << char(optopt) << " requires an argument" << std::endl;
+                }
+                else {
+                    std::cout << "Unknown arg" << std::endl;
+                }
+            default:
+                return 1;
+        }
+    }
 
     MPI_Init(&argc, &argv);
     MPI_Comm comm = MPI_COMM_WORLD;
@@ -78,7 +50,6 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(comm, &mpirank);
     MPI_Comm_size(comm, &mpisize);
 
-    // srand(mpirank);
     srand48(mpirank);
 
     MPI_Status status;
@@ -89,11 +60,12 @@ int main(int argc, char** argv) {
     double min_objective;
     std::vector<long> min_state;
     long size = parallel_state.num_stops();
+    double curr_objective = parallel_state.objective();
+    double res = curr_objective*TOLERANCE;
 
     long iters = 0;
 
-    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
-
+    do {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -132,8 +104,11 @@ int main(int argc, char** argv) {
         //Everyone's min_state should be the network minimum;
         parallel_state.set_idxs(min_state);
         iters++;
+    } while(curr_objective - min_objective > res && parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS);
+
+    if (mpirank == 0) {
+        std::cout << "Final objective: " << min_objective << std::endl;
     }
-    // std::cout<< "Hello from rank " << mpirank << ", we got annealed." << std::endl;
 
     MPI_Finalize();
 }
