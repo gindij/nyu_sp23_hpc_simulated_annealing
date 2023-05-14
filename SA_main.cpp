@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 
     MPI_Status status;
 
-    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/10000.txt");
+    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/100.txt");
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
 
-        MPI_Barrier(comm);
+        // MPI_Barrier(comm);
 
         if (mpirank != 0) {
             MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
