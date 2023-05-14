@@ -62,9 +62,8 @@ int main(int argc, char** argv) {
     long size = parallel_state.num_stops();
 
     long iters = 0;
-    long repeat_min = 0;
 
-    while(repeat_min < TOLERANCE && parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -89,12 +88,10 @@ int main(int argc, char** argv) {
                     for (long j = 0; j < size; j++)
                         min_state[j] = recv_min_state[j];
                     min_idx = i;
-                    repeat_min = 0;
                 }
             }
             // Rank 0 broadcasts the min state
             MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
-            MPI_Bcast(&repeat_min, 1, MPI_LONG, 0, comm);
             free(recv_min_state);
 
             std::cout << iters+1 << ": Best tour length = " << min_objective << std::endl;
@@ -105,7 +102,6 @@ int main(int argc, char** argv) {
         //Everyone's min_state should be the network minimum;
         parallel_state.set_idxs(min_state);
         iters++;
-        repeat_min++;
     } 
 
     if (mpirank == 0) {
