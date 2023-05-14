@@ -95,13 +95,6 @@ class Annealer {
             long iters = 0;
             while (iters < iters_to_run && this->iteration + iters < max_iters) { //**** temporary cap on iterations ****
                 long curr_it = this->iteration + iters;
-                if (curr_it % 50000 == 0) {
-                    int cont;
-                    std::cout << "Current minimum = " << min_objective << std::endl;
-                    std::cout << "Continue?" << std::endl;
-                    std::cin >> cont;
-                    if (!cont) break;
-                }
                 if (curr_it % 3 == 0) {
                     this->beta = log(exp(this->beta) + 1);
                 }
