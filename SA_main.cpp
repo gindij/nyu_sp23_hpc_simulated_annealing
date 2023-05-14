@@ -29,10 +29,10 @@ int main(int argc, char** argv) {
                 ANNEALING_STEPS_PER_ITERATION = atol(optarg);
                 break;
             case 't':
-                TOLERANCE = std::stod(optarg);
+                TOLERANCE = atol(optarg);
                 break;
             case '?':
-                if (optopt == 'n' || optopt == 'i' || optopt == 'j') {
+                if (optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't') {
                     std::cout << "Option " << char(optopt) << " requires an argument" << std::endl;
                 }
                 else {

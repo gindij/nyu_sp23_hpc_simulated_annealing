@@ -10,5 +10,5 @@
 #SBATCH --output=slurm_anneal_%j.out
 
 module purge
-module load openmpi/gcc/3.1.4
+module load openmpi/gcc/4.0.5
 mpirun ./SA_main -n 200
