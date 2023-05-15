@@ -5,6 +5,7 @@
 
 
 // command line args:
+//    -x : choose file from tsp_examples/spread=1.0
 //    -n : set maximum number of iterations in while loop
 //    -i : set maximum number of iterations within annealer
 //    -j : set number of steps per iterations in annealer
@@ -12,13 +13,17 @@
 int main(int argc, char** argv) {
 
     int c;
+    string filepath = "tsp_examples/spread=1.0/";
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
     double TOLERANCE = 1e-6;
 
-    while((c = getopt(argc, argv, "n:i:j:t:")) != -1) {
+    while((c = getopt(argc, argv, "x:n:i:j:t:")) != -1) {
         switch(c) {
+            case 'x':
+                filepath = filepath + optarg;
+                break;
             case 'n':
                 MAX_ITERATIONS = atol(optarg);
                 break;
@@ -32,7 +37,7 @@ int main(int argc, char** argv) {
                 TOLERANCE = std::stod(optarg);
                 break;
             case '?':
-                if (optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't') {
+                if (optopt == 'x' || optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't') {
                     std::cout << "Option " << char(optopt) << " requires an argument" << std::endl;
                 }
                 else {
@@ -54,7 +59,7 @@ int main(int argc, char** argv) {
 
     MPI_Status status;
 
-    TSP2DState parallel_state = TSP2DState::from_text_file("tsp_examples/spread=1.0/100.txt");
+    TSP2DState parallel_state = TSP2DState::from_text_file(filepath);
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
