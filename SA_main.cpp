@@ -98,11 +98,13 @@ int main(int argc, char** argv) {
                 }
             }
             // Rank 0 broadcasts the min state
-            MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
+            
             free(recv_min_state);
 
             std::cout << iters+1 << ": Best tour length = " << min_objective << std::endl;
         }
+
+        MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
 
         //Everyone's min_state should be the network minimum;
         residual = curr_objective - min_objective;
