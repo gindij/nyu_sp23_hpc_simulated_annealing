@@ -1,6 +1,7 @@
 #include <iostream>
 #include <mpi.h>
 #include <unistd.h>
+#include <string>
 #include "annealer.h"
 
 
@@ -13,7 +14,7 @@
 int main(int argc, char** argv) {
 
     int c;
-    string filepath = "tsp_examples/spread=1.0/";
+    std::string filepath = "tsp_examples/spread=1.0/";
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
