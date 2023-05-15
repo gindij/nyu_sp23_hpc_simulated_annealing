@@ -77,12 +77,13 @@ int main(int argc, char** argv) {
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
 
-        // MPI_Barrier(comm);
 
         if (mpirank != 0) {
             MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
             MPI_Send(min_state.data(), size, MPI_LONG, 0, 999, comm);
         }
+
+        MPI_Barrier(comm);
 
         if (mpirank == 0) {
             long* recv_min_state = (long*) malloc(size * sizeof(long));
