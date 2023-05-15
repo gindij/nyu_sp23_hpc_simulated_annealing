@@ -67,7 +67,8 @@ int main(int argc, char** argv) {
     double residual;
     std::vector<long> min_state;
     long size = parallel_state.num_stops();
-    double curr_objective = parallel_state.objective();
+    double global_min = parallel_state.objective();
+    std::vector<long> global_state = parallel_state.get_idxs();
 
     long iters = 0;
 
@@ -98,24 +99,27 @@ int main(int argc, char** argv) {
                 }
             }
             // Rank 0 broadcasts the min state
-            
             free(recv_min_state);
+            if (min_objective < global_min) {
+                global_min = min_objective;
+                global_state = min_state;
+            }
 
-            std::cout << iters+1 << ": Best tour length = " << min_objective << std::endl;
+            std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
         }
 
-        MPI_Bcast(min_state.data(), size, MPI_LONG, 0, comm);
+        MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
 
         //Everyone's min_state should be the network minimum;
-        residual = curr_objective - min_objective;
+        residual = global_min - min_objective;
         parallel_state.set_idxs(min_state);
-        curr_objective = min_objective;
+        global_min = min_objective;
         iters++;
     } 
     // while (residual > TOLERANCE);
 
     if (mpirank == 0) {
-        std::cout << "Final objective: " << min_objective << std::endl;
+        std::cout << "Final objective: " << global_min << std::endl;
     }
 
     if (mpirank == mpisize - 1) {
