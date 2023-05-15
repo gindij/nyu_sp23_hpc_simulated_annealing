@@ -120,6 +120,7 @@ int main(int argc, char** argv) {
     if (mpirank == 0) {
         std::cout << "Final objective: " << min_objective << std::endl;
     }
+    MPI_Barrier(comm);
 
     MPI_Finalize();
 }
