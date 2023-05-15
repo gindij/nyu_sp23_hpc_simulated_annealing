@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
                 ANNEALING_STEPS_PER_ITERATION = atol(optarg);
                 break;
             case 't':
-                TOLERANCE = atol(optarg);
+                TOLERANCE = std::stod(optarg);
                 break;
             case '?':
                 if (optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't') {
