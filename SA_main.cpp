@@ -65,8 +65,8 @@ int main(int argc, char** argv) {
 
     long iters = 0;
 
-    // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
-    do {
+    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+    // do {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -107,7 +107,8 @@ int main(int argc, char** argv) {
         parallel_state.set_idxs(min_state);
         curr_objective = min_objective;
         iters++;
-    } while (residual > TOLERANCE)
+    } 
+    // while (residual > TOLERANCE);
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << min_objective << std::endl;
