@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
-    long TOLERANCE = 10;
+    double TOLERANCE = 1e-6;
 
     while((c = getopt(argc, argv, "n:i:j:t:")) != -1) {
         switch(c) {
@@ -58,12 +58,15 @@ int main(int argc, char** argv) {
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
+    double residual;
     std::vector<long> min_state;
     long size = parallel_state.num_stops();
+    double curr_objective = parallel_state.objective();
 
     long iters = 0;
 
-    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+    // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+    do {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -100,9 +103,11 @@ int main(int argc, char** argv) {
         MPI_Barrier(comm);
 
         //Everyone's min_state should be the network minimum;
+        residual = curr_objective - min_objective;
         parallel_state.set_idxs(min_state);
+        curr_objective = min_objective;
         iters++;
-    } 
+    } while (residual > TOLERANCE)
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << min_objective << std::endl;
