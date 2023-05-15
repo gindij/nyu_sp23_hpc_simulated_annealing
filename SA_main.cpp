@@ -77,13 +77,10 @@ int main(int argc, char** argv) {
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
 
-
         if (mpirank != 0) {
             MPI_Send(&min_objective, 1, MPI_DOUBLE, 0, 999, comm);
             MPI_Send(min_state.data(), size, MPI_LONG, 0, 999, comm);
         }
-
-        MPI_Barrier(comm);
 
         if (mpirank == 0) {
             long* recv_min_state = (long*) malloc(size * sizeof(long));
@@ -107,8 +104,6 @@ int main(int argc, char** argv) {
             std::cout << iters+1 << ": Best tour length = " << min_objective << std::endl;
         }
 
-        MPI_Barrier(comm);
-
         //Everyone's min_state should be the network minimum;
         residual = curr_objective - min_objective;
         parallel_state.set_idxs(min_state);
@@ -120,7 +115,10 @@ int main(int argc, char** argv) {
     if (mpirank == 0) {
         std::cout << "Final objective: " << min_objective << std::endl;
     }
-    MPI_Barrier(comm);
+
+    if (mpirank == mpisize - 1) {
+        std::cout << "Final objective from last node: " << min_objective << std::endl;
+    }
 
     MPI_Finalize();
 }
