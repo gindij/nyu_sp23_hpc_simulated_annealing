@@ -208,9 +208,9 @@ class TSP2DState {
             if (stream.is_open()) {
                 for (long i = 0; i < this->N; i++) {
                     stream << std::setprecision(5)
-                         << this->x1[i]
+                         << this->x1[this->idxs[i]]
                          << " "
-                         << this->x2[i]
+                         << this->x2[this->idxs[i]]
                          << "\n";
                 }
                 stream << std::endl;
