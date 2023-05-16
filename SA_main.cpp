@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     long iters = 0;
 
     // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
-    while (timer < TOLERANCE); {
+    while (timer < TOLERANCE) {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
