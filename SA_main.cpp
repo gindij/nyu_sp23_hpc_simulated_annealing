@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
-    double TOLERANCE = 1e-6;
+    long TOLERANCE = 20;
 
     while((c = getopt(argc, argv, "x:n:i:j:t:")) != -1) {
         switch(c) {
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
-    double residual;
+    long timer = 0;
     std::vector<long> min_state;
     long size = parallel_state.num_stops();
     double global_min = parallel_state.objective();
@@ -72,8 +72,8 @@ int main(int argc, char** argv) {
 
     long iters = 0;
 
-    while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
-    // do {
+    // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
+    do {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -103,6 +103,7 @@ int main(int argc, char** argv) {
             if (min_objective < global_min) {
                 global_min = min_objective;
                 global_state = min_state;
+                timer = 0;
             }
 
             std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
@@ -111,12 +112,12 @@ int main(int argc, char** argv) {
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
 
         //Everyone's min_state should be the network minimum;
-        residual = global_min - min_objective;
+        // residual = global_min - min_objective;
         parallel_state.set_idxs(min_state);
-        global_min = min_objective;
+        // global_min = min_objective;
         iters++;
     } 
-    // while (residual > TOLERANCE);
+    while (timer < TOLERANCE);
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << global_min << std::endl;
