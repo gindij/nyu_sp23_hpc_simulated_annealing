@@ -16,11 +16,12 @@ enum BetaScaler {
 class Annealer {
     private:
         long iteration;
+        long size;
         double beta;
         std::vector<std::vector<double>> t_matrix;
         std::vector<long> min_state;
     public:
-        Annealer(long N, BetaScaler b) : iteration(1), t_matrix(N, std::vector<double>(N, 0)), min_state(N, 0) {
+        Annealer(long N, BetaScaler b) : iteration(1), size(N), t_matrix(N, std::vector<double>(N, 0)), min_state(N, 0) {
             switch(b) {
                 case LOG:
                     this->beta = log(1.01);
@@ -100,19 +101,17 @@ class Annealer {
                 }
                 this->generate_t_matrix(curr_state);
                 TSP2DTransition* trans = this->select_transition(curr_state);
-                // std::cout << "Selected transition: (" << trans->swap_first << ", " << trans->swap_second << ")" << std::endl; 
                 curr_state->step(trans);
                 curr_objective = curr_state->objective();
-                // std::cout << "Current energy = " << curr_objective << std::endl;
-                // std::cout << "Current beta = " << this->beta << std::endl;
                 if (curr_objective < min_objective) {
                     min_objective = curr_objective;
-                    this->min_state = curr_state->get_idxs();
+                    for (long i = 0; i < this->size; i++) {
+                        this->min_state[i] = curr_state->get_single_idx(i);
+                    }
                 }
                 iters++;
             }
             this->iteration += iters;
-            // std::cout << "iterations: " << iters << " - Final minimum found: "<<min_objective<<std::endl;
             return min_objective;
         }
 

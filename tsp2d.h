@@ -92,6 +92,10 @@ class TSP2DState {
             return copy;
         }
 
+        long get_single_idx(long i) {
+            return this->idxs[i];
+        }
+
         void set_idxs(std::vector<long> new_idxs) {
             for (long i = 0; i < this->N; i++)
                 this->idxs[i] = new_idxs[i];
