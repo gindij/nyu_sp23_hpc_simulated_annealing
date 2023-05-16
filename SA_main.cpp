@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
 
     int c;
     std::string filepath = "tsp_examples/spread=1.0/";
+    std::string viz_file = "viz_20.txt";
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
@@ -112,10 +113,12 @@ int main(int argc, char** argv) {
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
         MPI_Bcast(&timer, 1, MPI_LONG, 0, comm);
 
-        //Everyone's min_state should be the network minimum;
-        // residual = global_min - min_objective;
+
         parallel_state.set_idxs(global_state);
-        // global_min = min_objective;
+
+        if (iters % 10 == 0 && mpirank == 0) {
+            parallel_state.write_txt(viz_file);
+        }
         iters++;
         timer++;
     } 
