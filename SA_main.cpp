@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     long iters = 0;
 
     // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
-    do {
+    while (timer < TOLERANCE); {
         // each process searches for a next state
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
         min_state = parallel_annealer.get_min_state();
@@ -110,14 +110,15 @@ int main(int argc, char** argv) {
         }
 
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
+        MPI_Bcast(&timer, 1, MPI_LONG, 0, comm);
 
         //Everyone's min_state should be the network minimum;
         // residual = global_min - min_objective;
         parallel_state.set_idxs(min_state);
         // global_min = min_objective;
         iters++;
+        timer++;
     } 
-    while (timer < TOLERANCE);
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << global_min << std::endl;
