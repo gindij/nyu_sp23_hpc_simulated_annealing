@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
                 vizpath = optarg;
                 break;
             case '?':
-                if (optopt == 'x' || optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't' || optopt = 'v') {
+                if (optopt == 'x' || optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't' || optopt == 'v') {
                     std::cout << "Option " << char(optopt) << " requires an argument" << std::endl;
                 }
                 else {
