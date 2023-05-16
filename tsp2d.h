@@ -213,6 +213,7 @@ class TSP2DState {
                          << this->x2[i]
                          << "\n";
                 }
+                stream << std::endl;
                 stream.close();
             } else {
                 std::cout << "Unable to open file." << std::endl;
