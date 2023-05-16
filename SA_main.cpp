@@ -15,7 +15,8 @@ int main(int argc, char** argv) {
 
     int c;
     std::string filepath = "tsp_examples/spread=1.0/";
-    std::string viz_file = "viz_20.txt";
+    std::ofstream vizstream;
+    std::string vizpath = "viz20.txt";
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
@@ -117,7 +118,7 @@ int main(int argc, char** argv) {
         parallel_state.set_idxs(global_state);
 
         if (iters % 10 == 0 && mpirank == 0) {
-            parallel_state.write_txt(viz_file);
+            parallel_state.write_txt(vizstream, vizpath);
         }
         iters++;
         timer++;
