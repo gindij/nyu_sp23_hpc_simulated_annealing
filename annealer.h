@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
+#include <omp.h>
 #include "tsp2d.h"
 
 enum BetaScaler {
@@ -48,6 +49,7 @@ class Annealer {
         void generate_t_matrix(TSP2DState* curr_state) {
             long t = curr_state->num_stops();
             TSP2DTransition proposal = TSP2DTransition(0,0);
+        #pragma omp parallel for collapse(2)
             for (long i = 0; i < t; ++i) {
                 for (long j = 0; j < t; ++j) {
                     proposal = TSP2DTransition(i,j);
