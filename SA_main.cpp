@@ -111,9 +111,8 @@ int main(int argc, char** argv) {
                 timer = 0;
             }
 
-            std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
+            // std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
         }
-        std::cout << "Rank " << mpirank << " minimum = " << min_objective << std::endl;
 
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
         MPI_Bcast(&timer, 1, MPI_LONG, 0, comm);
@@ -130,10 +129,6 @@ int main(int argc, char** argv) {
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << global_min << std::endl;
-    }
-
-    if (mpirank == mpisize - 1) {
-        std::cout << "Final objective from last node: " << min_objective << std::endl;
     }
 
     MPI_Finalize();
