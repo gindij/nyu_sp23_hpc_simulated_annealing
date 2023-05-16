@@ -203,17 +203,17 @@ class TSP2DState {
         /**
          * Write tour to file pairs of points.
          */
-        void write_txt(std::string path) {
-            std::ofstream file(path);
-            if (file.is_open()) {
+        void write_txt(std::ofstream &stream, std::string path) {
+            stream.open(path, std::ios::app);
+            if (stream.is_open()) {
                 for (long i = 0; i < this->N; i++) {
-                    file << std::setprecision(5)
+                    stream << std::setprecision(5)
                          << this->x1[i]
                          << " "
                          << this->x2[i]
                          << "\n";
                 }
-                file.close();
+                stream.close();
             } else {
                 std::cout << "Unable to open file." << std::endl;
                 abort();
