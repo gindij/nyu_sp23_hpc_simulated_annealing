@@ -64,8 +64,11 @@ int main(int argc, char** argv) {
     srand48(mpirank);
 
     MPI_Status status;
-
+    double t1, t2;
+    t1 = MPI_Wtime();
     TSP2DState parallel_state = TSP2DState::from_text_file(filepath);
+    t2 = MPI_Wtime();
+    std::cout << "Loaded up at time = " << t2-t1 << " for process " << mpirank << std::endl;
     Annealer parallel_annealer = Annealer(parallel_state.num_stops(), LOG);
 
     double min_objective;
@@ -82,7 +85,9 @@ int main(int argc, char** argv) {
     // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
     while (timer < TOLERANCE) {
         // each process searches for a next state
+        t1 = MPI_Wtime();
         min_objective = parallel_annealer.anneal(&parallel_state, ANNEALING_STEPS_PER_ITERATION, MAX_ANNEALER_ITERATIONS);
+        t2 = MPI_Wtime();
         min_state = parallel_annealer.get_min_state();
 
         if (mpirank != 0) {
@@ -113,7 +118,8 @@ int main(int argc, char** argv) {
                 timer = 0;
             }
 
-            // std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
+            std::cout << iters+1 << ": Best tour length = " << global_min << std::endl;
+            std::cout << "Annealing took " << t2 - t1 << " seconds" << std::endl;
         }
 
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
