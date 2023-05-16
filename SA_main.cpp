@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
 
 
         parallel_state.set_idxs(global_state);
-
+        std::cout << "Hello from rank " << mpirank << std::endl;
         if (iters % 10 == 0 && mpirank == 0) {
             parallel_state.write_txt(vizstream, vizpath);
         }
