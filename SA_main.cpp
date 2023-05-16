@@ -77,6 +77,8 @@ int main(int argc, char** argv) {
 
     long iters = 0;
 
+    double begin, end;
+    begin = MPI_Wtime();
     // while(parallel_annealer.get_iteration() < MAX_ANNEALER_ITERATIONS && iters < MAX_ITERATIONS) {
     while (timer < TOLERANCE) {
         // each process searches for a next state
@@ -126,9 +128,11 @@ int main(int argc, char** argv) {
         iters++;
         timer++;
     } 
+    end = MPI_Wtime();
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << global_min << std::endl;
+        std::cout << "Time elapsed: " << end - begin << std::endl;
     }
 
     MPI_Finalize();
