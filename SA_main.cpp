@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
         //Everyone's min_state should be the network minimum;
         // residual = global_min - min_objective;
-        parallel_state.set_idxs(min_state);
+        parallel_state.set_idxs(global_state);
         // global_min = min_objective;
         iters++;
         timer++;
