@@ -16,13 +16,13 @@ int main(int argc, char** argv) {
     int c;
     std::string filepath = "tsp_examples/spread=1.0/";
     std::ofstream vizstream;
-    std::string vizpath = "viz20.txt";
+    std::string vizpath = "vizdefault.txt";
     long MAX_ITERATIONS = 100;
     long MAX_ANNEALER_ITERATIONS = 10000;
     long ANNEALING_STEPS_PER_ITERATION = 100;
     long TOLERANCE = 20;
 
-    while((c = getopt(argc, argv, "x:n:i:j:t:")) != -1) {
+    while((c = getopt(argc, argv, "x:n:i:j:t:v:")) != -1) {
         switch(c) {
             case 'x':
                 filepath = filepath + optarg;
@@ -39,8 +39,11 @@ int main(int argc, char** argv) {
             case 't':
                 TOLERANCE = atol(optarg);
                 break;
+            case 'v':
+                vizpath = optarg;
+                break;
             case '?':
-                if (optopt == 'x' || optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't') {
+                if (optopt == 'x' || optopt == 'n' || optopt == 'i' || optopt == 'j' || optopt == 't' || optopt = 'v') {
                     std::cout << "Option " << char(optopt) << " requires an argument" << std::endl;
                 }
                 else {
