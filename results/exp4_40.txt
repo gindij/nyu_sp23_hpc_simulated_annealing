@@ -56,4 +56,4 @@
 Final objective: 93.66
 Total annealer calls: 56
 Tolerance: 10
-Time elapsed: 0.10185
+Time elapsed: 0.414849

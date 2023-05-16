@@ -103,17 +103,8 @@
 103: Best tour length = 90.9727
 104: Best tour length = 90.9727
 105: Best tour length = 90.9727
-106: Best tour length = 90.7328
-107: Best tour length = 90.7328
-108: Best tour length = 90.7328
-109: Best tour length = 90.7328
-110: Best tour length = 90.7328
-111: Best tour length = 90.7328
-112: Best tour length = 90.7328
-113: Best tour length = 90.7328
-114: Best tour length = 90.7328
-115: Best tour length = 90.7328
-Final objective: 90.7328
-Total annealer calls: 116
+106: Best tour length = 90.9727
+Final objective: 90.9727
+Total annealer calls: 107
 Tolerance: 10
-Time elapsed: 0.169698
+Time elapsed: 0.761977

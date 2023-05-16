@@ -98,70 +98,16 @@
 98: Best tour length = 165.759
 99: Best tour length = 165.759
 100: Best tour length = 164.09
-101: Best tour length = 163.323
-102: Best tour length = 162.626
-103: Best tour length = 162.626
-104: Best tour length = 161.379
-105: Best tour length = 160.638
-106: Best tour length = 160.638
-107: Best tour length = 160.308
-108: Best tour length = 160.308
-109: Best tour length = 160.226
-110: Best tour length = 159.228
-111: Best tour length = 158.943
-112: Best tour length = 158.943
-113: Best tour length = 158.943
-114: Best tour length = 158.943
-115: Best tour length = 158.943
-116: Best tour length = 158.933
-117: Best tour length = 158.736
-118: Best tour length = 158.736
-119: Best tour length = 158.736
-120: Best tour length = 158.736
-121: Best tour length = 158.736
-122: Best tour length = 158.318
-123: Best tour length = 158.289
-124: Best tour length = 158.289
-125: Best tour length = 158.273
-126: Best tour length = 158.273
-127: Best tour length = 158.253
-128: Best tour length = 158.253
-129: Best tour length = 158.253
-130: Best tour length = 158.253
-131: Best tour length = 158.253
-132: Best tour length = 157.308
-133: Best tour length = 157.308
-134: Best tour length = 157.104
-135: Best tour length = 157.104
-136: Best tour length = 157.104
-137: Best tour length = 157.104
-138: Best tour length = 156.453
-139: Best tour length = 156.453
-140: Best tour length = 156.453
-141: Best tour length = 156.453
-142: Best tour length = 155.835
-143: Best tour length = 155.693
-144: Best tour length = 155.693
-145: Best tour length = 155.693
-146: Best tour length = 155.693
-147: Best tour length = 155.512
-148: Best tour length = 155.512
-149: Best tour length = 155.512
-150: Best tour length = 155.387
-151: Best tour length = 155.244
-152: Best tour length = 155.108
-153: Best tour length = 155.108
-154: Best tour length = 154.004
-155: Best tour length = 154.004
-156: Best tour length = 154.004
-157: Best tour length = 154.004
-158: Best tour length = 154.004
-159: Best tour length = 154.004
-160: Best tour length = 154.004
-161: Best tour length = 154.004
-162: Best tour length = 154.004
-163: Best tour length = 154.004
-Final objective: 154.004
-Total annealer calls: 164
+101: Best tour length = 164.09
+102: Best tour length = 164.09
+103: Best tour length = 164.09
+104: Best tour length = 164.09
+105: Best tour length = 164.09
+106: Best tour length = 164.09
+107: Best tour length = 164.09
+108: Best tour length = 164.09
+109: Best tour length = 164.09
+Final objective: 164.09
+Total annealer calls: 110
 Tolerance: 10
-Time elapsed: 1.47565
+Time elapsed: 4.00635
