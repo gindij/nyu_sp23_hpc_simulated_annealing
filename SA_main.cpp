@@ -132,6 +132,8 @@ int main(int argc, char** argv) {
 
     if (mpirank == 0) {
         std::cout << "Final objective: " << global_min << std::endl;
+        std::cout << "Total annealer calls: " << iters+1 << std::endl;
+        std::cout << "Tolerance: " << TOLERANCE << std::endl;
         std::cout << "Time elapsed: " << end - begin << std::endl;
     }
 
