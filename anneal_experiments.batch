@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=18:00:00
-#SBATCH --mem=2GB
+#SBATCH --mem=10GB
 #SBATCH --job-name=anneal_size
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jg6848@nyu.edu
