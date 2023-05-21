@@ -118,9 +118,7 @@ int main(int argc, char** argv) {
         MPI_Bcast(global_state.data(), size, MPI_LONG, 0, comm);
         MPI_Bcast(&timer, 1, MPI_LONG, 0, comm);
 
-
         parallel_state.set_idxs(global_state);
-        std::cout << "Hello from rank " << mpirank << std::endl;
         if (iters % 10 == 0 && mpirank == 0) {
             parallel_state.write_txt(vizstream, vizpath);
         }

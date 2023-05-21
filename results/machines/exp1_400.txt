@@ -1,0 +1,41 @@
+1: Best tour length = 3666.33
+2: Best tour length = 3665.84
+3: Best tour length = 3562.79
+4: Best tour length = 3418.48
+5: Best tour length = 3010.67
+6: Best tour length = 2746.38
+7: Best tour length = 2330.42
+8: Best tour length = 2078.54
+9: Best tour length = 1936.96
+10: Best tour length = 1817.02
+11: Best tour length = 1725.22
+12: Best tour length = 1691.43
+13: Best tour length = 1672.69
+14: Best tour length = 1671.09
+15: Best tour length = 1671.09
+16: Best tour length = 1668.27
+17: Best tour length = 1649.15
+18: Best tour length = 1648.54
+19: Best tour length = 1628.95
+20: Best tour length = 1617.57
+21: Best tour length = 1617.57
+22: Best tour length = 1617.57
+23: Best tour length = 1616.33
+24: Best tour length = 1616.04
+25: Best tour length = 1616.04
+26: Best tour length = 1615.26
+27: Best tour length = 1614.37
+28: Best tour length = 1612.45
+29: Best tour length = 1612.45
+30: Best tour length = 1608.28
+31: Best tour length = 1608.28
+32: Best tour length = 1608.28
+33: Best tour length = 1605.58
+34: Best tour length = 1605.58
+35: Best tour length = 1605.58
+36: Best tour length = 1605.58
+37: Best tour length = 1605.58
+Final objective: 1605.58
+Total annealer calls: 38
+Tolerance: 5
+Time elapsed: 112.61
