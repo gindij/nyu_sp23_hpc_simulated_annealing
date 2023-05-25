@@ -19,13 +19,3 @@ mpiexec -n 32 ./SA_main -x "400.txt" -j 500 -i 100000 -v "viz/size/size400_proc3
 mpiexec -n 32 ./SA_main -x "800.txt" -j 500 -i 100000 -v "viz/size/size800_proc32.txt" -t 5 > "results/size/exp32_800.txt"
 mpiexec -n 32 ./SA_main -x "1600.txt" -j 500 -i 100000 -v "viz/size/size1600_proc32.txt" -t 5 > "results/size/exp32_1600.txt"
 mpiexec -n 32 ./SA_main -x "3200.txt" -j 500 -i 100000 -v "viz/size/size3200_proc32.txt" -t 5 > "results/size/exp32_3200.txt"
-
-# vary number of nodes keeping problem sized fixed 
-mpiexec -n 1 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc1.txt" -t 5 > "results/machines/exp1_400.txt"
-mpiexec -n 4 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc4.txt" -t 5 > "results/machines/exp4_400.txt"
-mpiexec -n 8 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc8.txt" -t 5 > "results/machines/exp8_400.txt"
-mpiexec -n 16 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc16.txt" -t 5 > "results/machines/exp16_400.txt"
-mpiexec -n 32 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc32.txt" -t 5 > "results/machines/exp32_400.txt"
-
-# run one big example
-mpiexec -n 32 ./SA_main -x "100000.txt" -j 1000 -i 100000 -v "viz/size/size100k_proc32.txt" -t 3 > "results/size/exp32_100k.txt"

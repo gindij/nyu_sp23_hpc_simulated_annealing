@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --nodes=32
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=18:00:00
+#SBATCH --mem=10GB
+#SBATCH --job-name=anneal_size
+#SBATCH --mail-type=END
+#SBATCH --mail-user=jg6848@nyu.edu
+#SBATCH --output=slurm_anneal_%j.out
+
+module purge
+module load openmpi/gcc/4.0.5
+
+mpiexec -n 1 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc1.txt" -t 5 > "results/machines/exp1_400.txt"
+mpiexec -n 2 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc1.txt" -t 5 > "results/machines/exp2_400.txt"
+mpiexec -n 4 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc4.txt" -t 5 > "results/machines/exp4_400.txt"
+mpiexec -n 8 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc8.txt" -t 5 > "results/machines/exp8_400.txt"
+mpiexec -n 16 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc16.txt" -t 5 > "results/machines/exp16_400.txt"
+mpiexec -n 32 ./SA_main -x "400.txt" -j 500 -i 1000000 -v "viz/machines/size400_proc32.txt" -t 5 > "results/machines/exp32_400.txt"
